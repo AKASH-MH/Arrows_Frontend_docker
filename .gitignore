@@ -419,6 +419,7 @@ FodyWeavers.xsd
 node_modules/
 packages/
 node_modules/.bin
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -443,3 +444,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+=======
+>>>>>>> 71a9fe37540c1ae3643fcc6cc5542b2e2f2c2121
