@@ -36,6 +36,8 @@ jobs:
 
       - name: Build
         working-directory: frontend
+        env:
+          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path && format('{0}/', steps.pages.outputs.base_path) || '/' }}
         run: npm run build
 
       - name: Upload artifact
