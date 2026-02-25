@@ -282,6 +282,7 @@ const FormField = ({
     ? 'Select skills'
     : 'Select options';
   const hasOpenDropdown = isDropdownOpen && (type === 'select' || type === 'multiselect');
+  const effectiveError = localError || error;
 
   const baseOptions = safeOptions;
   const mergedOptions = [...baseOptions, ...customOptions].filter(
@@ -308,7 +309,7 @@ const FormField = ({
         )}
       </label>
       {type === 'multiselect' ? (
-        <div className={`multiselect-container${isDropdownOpen ? ' open' : ''}`} ref={dropdownRef}>
+        <div className={`multiselect-container${isDropdownOpen ? ' open' : ''}${effectiveError ? ' error' : ''}`} ref={dropdownRef}>
           <div
             className={`selected-items${isDropdownOpen ? ' open' : ''}`}
             role="button"
@@ -385,7 +386,7 @@ const FormField = ({
           )}
         </div>
       ) : type === 'select' ? (
-        <div className={`select-field${isDropdownOpen ? ' open' : ''}`} ref={dropdownRef}>
+        <div className={`select-field${isDropdownOpen ? ' open' : ''}${effectiveError ? ' error' : ''}`} ref={dropdownRef}>
           <button
             type="button"
             id={name}
@@ -434,7 +435,7 @@ const FormField = ({
             onChange={handleChange}
             onBlur={handleBlur}
             required={required}
-            className={error ? 'error' : ''}
+            className={effectiveError ? 'error' : ''}
             placeholder={placeholder}
             rows="4"
             disabled={disabled}
@@ -448,7 +449,7 @@ const FormField = ({
                 : (value && value.name) || (typeof value === 'string' ? value : '');
 
               return (
-                <div className={`file-field${error ? ' error' : ''}`}>
+                <div className={`file-field${effectiveError ? ' error' : ''}`}>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -485,7 +486,7 @@ const FormField = ({
                       readOnly
                       value={fileName || ''}
                       placeholder={placeholder || 'No file chosen'}
-                      className={`file-visual-input${error ? ' error' : ''}`}
+                      className={`file-visual-input${effectiveError ? ' error' : ''}`}
                       onClick={() => {
                         if (!disabled && fileInputRef.current) {
                           fileInputRef.current.click();
@@ -524,7 +525,7 @@ const FormField = ({
                 min={type === 'number' ? '0' : undefined}
                 inputMode={type === 'number' ? 'numeric' : undefined}
                 pattern={type === 'number' ? '[0-9]*' : undefined}
-                className={error ? 'error' : ''}
+                className={effectiveError ? 'error' : ''}
                 placeholder={placeholder}
                 accept={accept}
                 multiple={type === 'file' ? multiple : undefined}
@@ -554,7 +555,7 @@ const FormField = ({
             }
 
             return (
-              <div className={`field-control has-prefix${error ? ' error' : ''}`}>
+              <div className={`field-control has-prefix${effectiveError ? ' error' : ''}`}>
                 <span className="field-prefix">{prefix}</span>
                 {inputElement}
                 {/* Display selected file name(s) for file inputs */}
@@ -577,10 +578,10 @@ const FormField = ({
         )
       )}
       {isValidating && <span className="validation-loading">Validating...</span>}
-      {!suppressError && (localError || error) && (
+      {!suppressError && effectiveError && (
         <>
           {console.log(`[FormField] Rendering error for ${name}: localError="${localError}", propError="${error}"`)}
-          <span className="error-message">{localError || error}</span>
+          <span className="error-message">{effectiveError}</span>
         </>
       )}
     </div>

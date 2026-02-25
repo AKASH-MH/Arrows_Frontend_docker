@@ -19,17 +19,22 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
 
   const validateEmail = async () => {
-    if (!email) return;
+    const emailValue = email.trim();
+    if (!emailValue) {
+      setEmailError('Email address is required');
+      return;
+    }
     setEmailError('Validating email...');
     // Simulate AJAX validation for email format
     try {
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (emailRegex.test(email)) {
+          if (emailRegex.test(emailValue)) {
             resolve();
           } else {
             reject(new Error('Invalid email format'));
@@ -44,6 +49,34 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const emailValue = email.trim();
+    const passwordValue = password.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    let hasValidationError = false;
+
+    if (!emailValue) {
+      setEmailError('Email address is required');
+      hasValidationError = true;
+    } else if (!emailRegex.test(emailValue)) {
+      setEmailError('Please enter a valid email address');
+      hasValidationError = true;
+    } else {
+      setEmailError('');
+    }
+
+    if (!passwordValue) {
+      setPasswordError('Password is required');
+      hasValidationError = true;
+    } else {
+      setPasswordError('');
+    }
+
+    if (hasValidationError) {
+      setError('');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -84,7 +117,7 @@ If you've forgotten your password, use the "Forgot Password" option<br></br> to 
         <div className="logo-wrapper">
         <img src={arrowLogo} alt="Arrow Logo" className="arrow-logo" />
         </div>
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} className="login-form" noValidate>
           <div className="form-group email-group">
             <label htmlFor="email">Email Address</label>
             <div className="input-wrapper">
@@ -93,7 +126,12 @@ If you've forgotten your password, use the "Forgot Password" option<br></br> to 
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) {
+                    setEmailError('');
+                  }
+                }}
                 onBlur={validateEmail}
                 placeholder="Enter your email address"
                 required
@@ -109,7 +147,15 @@ If you've forgotten your password, use the "Forgot Password" option<br></br> to 
                 type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (passwordError) {
+                    setPasswordError('');
+                  }
+                  if (error) {
+                    setError('');
+                  }
+                }}
                 placeholder="Enter your password"
                 required
               />
@@ -123,6 +169,7 @@ If you've forgotten your password, use the "Forgot Password" option<br></br> to 
               </button>
             </div>
           </div>
+          {passwordError && <p className="error-message">{passwordError}</p>}
           <div className="form-options">
             <label className="remember-me">
               <input type="checkbox" /> Remember me

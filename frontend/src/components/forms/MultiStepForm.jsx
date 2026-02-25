@@ -37,6 +37,53 @@ const MultiStepForm = ({
     return lines.join('\n');
   };
 
+  const getEscapedSelectorValue = (value) => {
+    const rawValue = String(value || '');
+    if (
+      typeof window !== 'undefined' &&
+      window.CSS &&
+      typeof window.CSS.escape === 'function'
+    ) {
+      return window.CSS.escape(rawValue);
+    }
+    return rawValue.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+  };
+
+  const focusFieldByName = (fieldName) => {
+    if (!fieldName || typeof document === 'undefined') return false;
+    const escapedName = getEscapedSelectorValue(fieldName);
+    const selectors = [
+      `[name="${escapedName}"]`,
+      `#${escapedName}`,
+      `.field-${escapedName} input`,
+      `.field-${escapedName} textarea`,
+      `.field-${escapedName} .select-trigger`,
+      `.field-${escapedName} .selected-items`,
+      `.field-${escapedName}`
+    ];
+
+    for (const selector of selectors) {
+      const element = document.querySelector(selector);
+      if (!element) continue;
+      element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      if (typeof element.focus === 'function') {
+        try {
+          element.focus({ preventScroll: true });
+        } catch {
+          element.focus();
+        }
+      }
+      return true;
+    }
+
+    return false;
+  };
+
+  const focusFirstInvalidField = (fieldNames = []) => {
+    const uniqueFieldNames = toUniqueList(fieldNames);
+    uniqueFieldNames.some((fieldName) => focusFieldByName(fieldName));
+  };
+
   const getStepIssues = (stepIndex) => {
     const currentStepFields = stepFields[stepIndex] || steps[stepIndex]?.fields || [];
 
@@ -44,7 +91,7 @@ const MultiStepForm = ({
       return { missing: [], invalid: [] };
     }
 
-    return currentStepFields.reduce(
+      return currentStepFields.reduce(
       (acc, field) => {
         const fieldName = typeof field === 'string' ? field : field.name;
         const fieldLabel = normalizeLabel(
@@ -63,13 +110,15 @@ const MultiStepForm = ({
 
         if (isRequired && !hasValue) {
           acc.missing.push(fieldLabel);
+          acc.missingFieldNames.push(fieldName);
         } else if (hasError) {
           acc.invalid.push(fieldLabel);
+          acc.invalidFieldNames.push(fieldName);
         }
 
         return acc;
       },
-      { missing: [], invalid: [] }
+      { missing: [], missingFieldNames: [], invalid: [], invalidFieldNames: [] }
     );
   };
 
@@ -77,11 +126,12 @@ const MultiStepForm = ({
     if (steps[stepIndex]?.skipValidation) {
       return;
     }
-    const { missing, invalid } = getStepIssues(stepIndex);
+    const { missing, missingFieldNames, invalid, invalidFieldNames } = getStepIssues(stepIndex);
     if (missing.length === 0 && invalid.length === 0) {
       return;
     }
 
+    focusFirstInvalidField([...(missingFieldNames || []), ...(invalidFieldNames || [])]);
     window.alert(buildWarningMessage(missing, invalid));
   };
 
@@ -106,7 +156,9 @@ const MultiStepForm = ({
           stepIssues = {
             isValid: false,
             missingFields: [],
-            invalidFields: ['Please review this step']
+            missingFieldNames: [],
+            invalidFields: ['Please review this step'],
+            invalidFieldNames: []
           };
           console.error('[MultiStepForm] Step validation failed:', validationError);
         }
@@ -122,6 +174,10 @@ const MultiStepForm = ({
       if (isStepValid) {
         setCurrentStep(currentStep + 1);
       } else {
+        focusFirstInvalidField([
+          ...(stepIssues?.missingFieldNames || []),
+          ...(stepIssues?.invalidFieldNames || [])
+        ]);
         if (stepIssues?.missingFields?.length || stepIssues?.invalidFields?.length) {
           window.alert(
             buildWarningMessage(stepIssues.missingFields || [], stepIssues.invalidFields || [])
@@ -175,7 +231,9 @@ const MultiStepForm = ({
           stepIssues = {
             isValid: false,
             missingFields: [],
-            invalidFields: ['Please review this step']
+            missingFieldNames: [],
+            invalidFields: ['Please review this step'],
+            invalidFieldNames: []
           };
           console.error('[MultiStepForm] Submit validation failed:', validationError);
         }
@@ -191,6 +249,10 @@ const MultiStepForm = ({
       if (isStepValid) {
         onSubmit(formData);
       } else if (stepIssues?.missingFields?.length || stepIssues?.invalidFields?.length) {
+        focusFirstInvalidField([
+          ...(stepIssues?.missingFieldNames || []),
+          ...(stepIssues?.invalidFieldNames || [])
+        ]);
         window.alert(
           buildWarningMessage(stepIssues.missingFields || [], stepIssues.invalidFields || [])
         );
