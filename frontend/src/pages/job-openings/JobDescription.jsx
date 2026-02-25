@@ -1,7 +1,6 @@
 import * as React from "react";
 import { FiArrowLeft, FiCheck, FiEye, FiPlus, FiSearch, FiX } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { buildMeetingFromPreScreening, upsertMeeting } from "../../utils/meetingStore";
 import styles from "./JobDescription.module.scss";
 
   const fallbackJob = {
@@ -215,8 +214,6 @@ const JobDescription = () => {
   const commitPreScreeningMove = React.useCallback(() => {
     if (!preScreeningModal?.rowId) return;
 
-    const selectedCandidate = candidateRows.find((row) => row.rowId === preScreeningModal.rowId);
-
     setCandidateRows((prev) =>
       prev.map((row) =>
         row.rowId === preScreeningModal.rowId
@@ -228,21 +225,11 @@ const JobDescription = () => {
           : row
       )
     );
-
-    const nextMeeting = buildMeetingFromPreScreening({
-      candidate: selectedCandidate,
-      job,
-      formData: preScreeningModal,
-    });
-    if (nextMeeting) {
-      upsertMeeting(nextMeeting);
-    }
-
     setActiveStage("Pre-Screening");
     setSearchTerm("");
     setPreScreeningModal(null);
     setStageMoveToast("Candidate Moved Pre-Screening");
-  }, [candidateRows, job, preScreeningModal]);
+  }, [preScreeningModal]);
 
   const handleCandidateEyeClick = React.useCallback((row) => {
     setActiveStage("Map Candidates");

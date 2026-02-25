@@ -1,7 +1,4 @@
-
-
-import { useState, useRef, useEffect } from 'react';
-import bellIconUrl from '../../assets/icons/bell.svg'; // ← adjust the relative path to your file
+import { useEffect, useRef, useState } from 'react';
 import './notification.scss'; // import the SCSS (global)
 
 
@@ -38,7 +35,7 @@ export default function NotificationBell() {
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}
       >
-        <img className="icon" src={bellIconUrl} alt="" aria-hidden />
+        
         {unread > 0 && (
           <span className="notifBadge" aria-label={`${unread} unread notifications`}>
             {unread}
@@ -75,6 +72,5 @@ export default function NotificationBell() {
     </div>
   );
 }
-
 
 

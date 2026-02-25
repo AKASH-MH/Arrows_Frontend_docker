@@ -100,6 +100,10 @@
   flex-direction: column;
 }
 
+.stacked-field-below {
+  margin-top: 12px;
+}
+
 .reusable-form-page.job-opening-form .form-field {
   margin-bottom: 0;
 }
@@ -1392,7 +1396,9 @@
 
   .grid-cell.grid-row-1,
   .grid-cell.grid-row-2,
-  .grid-cell.grid-row-3 {
+  .grid-cell.grid-row-3,
+  .grid-cell.grid-row-4,
+  .grid-cell.grid-row-5 {
     grid-row: auto;
   }
 

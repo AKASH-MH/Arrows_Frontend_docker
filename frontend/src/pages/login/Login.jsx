@@ -7,9 +7,9 @@ import { MdOutlineEmail } from "react-icons/md";
 import { TbLockPassword } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 import arrowLogo from "../../assets/login/arrow_logo.png";
+import maskGroup from "../../assets/login/mask_group.png";
 import loginCircle from "../../assets/login/login_circle.png";
 import loginCircle2 from "../../assets/login/login_circle2.png";
-import maskGroup from "../../assets/login/mask_group.png";
 import './Login.css';
 
 const Login = () => {

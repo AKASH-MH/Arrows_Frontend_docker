@@ -1,5 +1,4 @@
 
-
 import * as React from "react";
 import { FiEdit2, FiEye, FiFilter, FiMoreHorizontal, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +6,6 @@ import { jobOpeningConfig } from "../../components/forms/formConfigs";
 import ReusableForm from "../../components/forms/ReusableForm";
 import { debounce } from "../../utils/debounce";
 import styles from "./JobOpenings.module.scss";
-
-
 // Memoized filter bar component to prevent unnecessary re-renders
 const FilterBar = React.memo(({
   searchTerm,
@@ -131,6 +128,7 @@ export default function JobOpenings() {
       technicalSkills: ["react", "javascript", "typescript"],
       softSkills: ["communication", "teamwork"],
       additionalSkills: "Redux",
+      addTechnicalSkills: ["machine-learning", "azure"],
       clientId: "C1292938",
       clientName: "MethodHub",
       contactPersonName: "Divya Mehta",
@@ -189,6 +187,7 @@ export default function JobOpenings() {
       technicalSkills: ["sql", "aws"],
       softSkills: ["leadership", "communication"],
       additionalSkills: "Roadmapping",
+      addTechnicalSkills: ["data-science"],
       clientId: "C1292432",
       clientName: "Arrows Inc",
       contactPersonName: "Rahul Mehta",
@@ -237,6 +236,7 @@ export default function JobOpenings() {
       technicalSkills: ["html", "css"],
       softSkills: ["creativity", "presentation"],
       additionalSkills: "Figma",
+      extraTechnicalSkills: ["computer-vision"],
       clientId: "C1292921",
       clientName: "NovaLabs",
       contactPersonName: "Arjun Rao",
@@ -429,6 +429,7 @@ export default function JobOpenings() {
   const handleJobOpeningSubmit = React.useCallback((data) => {
     const normalized = {
       ...data,
+      extraTechnicalSkills: data.extraTechnicalSkills ?? data.addTechnicalSkills ?? [],
       jobOpeningStatus: data.jobOpeningStatus || data.jobStatus || 'Active'
     };
     if (editingIndex !== null) {
@@ -489,7 +490,15 @@ export default function JobOpenings() {
             )}
             <ReusableForm
               config={jobOpeningConfig}
-              initialData={editingData}
+              initialData={
+                editingData
+                  ? {
+                      ...editingData,
+                      extraTechnicalSkills:
+                        editingData.extraTechnicalSkills ?? editingData.addTechnicalSkills ?? []
+                    }
+                  : editingData
+              }
               readOnly={editLocked}
               onSubmit={handleJobOpeningSubmit}
             />
