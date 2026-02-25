@@ -452,7 +452,9 @@ const ReusableForm = ({ config, onSubmit, initialData, readOnly = false }) => {
     const stepFields = config.steps[stepIndex]?.fields || [];
     const updatedErrors = { ...validationErrors };
     const missingFields = [];
+    const missingFieldNames = [];
     const invalidFields = [];
+    const invalidFieldNames = [];
 
     const isEmptyValue = (value) =>
       value === undefined ||
@@ -488,8 +490,10 @@ const ReusableForm = ({ config, onSubmit, initialData, readOnly = false }) => {
 
         if (field.required && isEmptyValue(value)) {
           missingFields.push(fieldLabel);
+          missingFieldNames.push(field.name);
         } else {
           invalidFields.push(fieldLabel);
+          invalidFieldNames.push(field.name);
         }
       } else if (updatedErrors[field.name]) {
         delete updatedErrors[field.name];
@@ -505,7 +509,9 @@ const ReusableForm = ({ config, onSubmit, initialData, readOnly = false }) => {
       isValid: missingFields.length === 0 && invalidFields.length === 0,
       errors: updatedErrors,
       missingFields,
-      invalidFields
+      missingFieldNames,
+      invalidFields,
+      invalidFieldNames
     };
   };
 
